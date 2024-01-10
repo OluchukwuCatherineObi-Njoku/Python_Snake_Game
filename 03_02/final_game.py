@@ -72,9 +72,11 @@ def game_loop():
 
 
 def food_collision():
-    global food_pos, score
+    global food_pos, score, DELAY
     if get_distance(snake[-1], food_pos) < 20:
         score += 1  # score = score + 1
+        if score % 5 == 0:
+            DELAY -= 10
         food_pos = get_random_food_pos()
         food.goto(food_pos)
         return True
