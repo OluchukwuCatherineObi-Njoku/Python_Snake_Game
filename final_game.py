@@ -3,35 +3,17 @@ import turtle
 import random
 
 # Define program constants
-WIDTH = 800
-HEIGHT = 600
-DELAY = 75  # Milliseconds
-FOOD_SIZE = 32
-SNAKE_SIZE = 20
+WIDTH = 500
+HEIGHT = 500
+DELAY = 100  # Milliseconds
+FOOD_SIZE = 10
 
 offsets = {
-    "up": (0, SNAKE_SIZE),
-    "down": (0, -SNAKE_SIZE),
-    "left": (-SNAKE_SIZE, 0),
-    "right": (SNAKE_SIZE, 0)
+    "up": (0, 20),
+    "down": (0, -20),
+    "left": (-20, 0),
+    "right": (20, 0)
 }
-
-# High score
-high_score = 0
-
-# Load the high score if it exists
-try:
-    with open("high_score.txt", "r") as file:
-        high_score = int(file.read())
-except FileNotFoundError:
-    pass
-
-def update_high_score():
-    global high_score
-    if score > high_score:
-        high_score = score
-        with open("high_score.txt", "w") as file:
-            file.write(str(high_score))
 
 
 def bind_direction_keys():
@@ -76,17 +58,13 @@ def game_loop():
         if not food_collision():
             snake.pop(0)  # Keep the snake the same length unless fed.
 
-        # Draw snake.
-        stamper.shape("assets/snake-head-20x20.gif")
-        stamper.goto(snake[-1][0], snake[-1][1])
-        stamper.stamp()
-        stamper.shape("circle")
-        for segment in snake[:-1]:
+        # Draw snake for the first time.
+        for segment in snake:
             stamper.goto(segment[0], segment[1])
             stamper.stamp()
 
         # Refresh screen
-        screen.title(f"Snake Game. Score: {score} High Score: {high_score}")
+        screen.title(f"Snake Game. Score: {score}")
         screen.update()
 
         # Rinse and repeat
@@ -94,10 +72,11 @@ def game_loop():
 
 
 def food_collision():
-    global food_pos, score
+    global food_pos, score, DELAY
     if get_distance(snake[-1], food_pos) < 20:
         score += 1  # score = score + 1
-        update_high_score()
+        if score % 5 == 0:
+            DELAY -= 10
         food_pos = get_random_food_pos()
         food.goto(food_pos)
         return True
@@ -120,7 +99,7 @@ def get_distance(pos1, pos2):
 def reset():
     global score, snake, snake_direction, food_pos
     score = 0
-    snake = [[0, 0], [SNAKE_SIZE, 0], [SNAKE_SIZE * 2, 0], [SNAKE_SIZE * 3, 0]]
+    snake = [[0, 0], [20, 0], [40, 0], [60, 0]]
     snake_direction = "up"
     food_pos = get_random_food_pos()
     food.goto(food_pos)
@@ -131,9 +110,7 @@ def reset():
 screen = turtle.Screen()
 screen.setup(WIDTH, HEIGHT)  # Set the dimensions of the Turtle Graphics window.
 screen.title("Snake")
-screen.bgpic("assets/bg2.gif")
-screen.register_shape("assets/snake-food-32x32.gif")
-screen.register_shape("assets/snake-head-20x20.gif")
+screen.bgcolor("pink")
 screen.tracer(0)  # Turn off automatic animation.
 
 # Event handlers
@@ -142,13 +119,13 @@ bind_direction_keys()
 
 # Create a turtle to do your bidding
 stamper = turtle.Turtle()
-stamper.shape("circle")
-stamper.color("#009ef1")
+stamper.shape("square")
 stamper.penup()
 
 # Food
 food = turtle.Turtle()
-food.shape("assets/snake-food-32x32.gif")
+food.shape("circle")
+food.color("red")
 food.shapesize(FOOD_SIZE / 20)
 food.penup()
 
